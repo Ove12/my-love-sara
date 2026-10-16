@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#1a103c">
+  <meta name="description" content="A romantic anime-inspired proposal website created especially for Sara.">
+  <title>For Sara 💗 | Something Special</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Dancing+Script:wght@600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- EmailJS SDK (Official browser library) -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- YouTube IFrame API for background song (Ed Sheeran - Perfect) -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Animated Canvases -->
+  <canvas id="stars-canvas" aria-hidden="true"></canvas>
+  <canvas id="sakura-canvas" aria-hidden="true"></canvas>
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient Glowing Orbs -->
+  <div class="ambient-glow glow-1" aria-hidden="true"></div>
+  <div class="ambient-glow glow-2" aria-hidden="true"></div>
+  <div class="ambient-glow glow-3" aria-hidden="true"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-screen" class="loading-screen" aria-live="polite">
+    <div class="loader-content">
+      <div class="pulsing-heart" aria-hidden="true">
+        <span>💗</span>
+      </div>
+      <p class="loader-text">Preparing something magical for Sara...</p>
+      <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+  </div>
+
+  <!-- Background Audio Element (Custom MP3 option) -->
+  <audio id="bg-audio" loop preload="auto">
+    <source src="assets/music/romantic-melody.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Background YouTube Audio Player (Ed Sheeran - Perfect, Full Volume Auto-Play) -->
+  <div id="yt-player-container" style="position: fixed; width: 200px; height: 200px; right: 0; bottom: 0; opacity: 0.001; pointer-events: none; z-index: -9999;" aria-hidden="true">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- Main Multi-Screen Container -->
+  <main class="app-container" id="app-container">
+
+    <!-- ==============================================
+         SCREEN 1: Secret Password
+         ============================================== -->
+    <section class="screen active" id="screen-1" aria-labelledby="screen-1-title">
+      <div class="glass-card lock-card">
+        <div class="card-badge">Private &amp; Special 🌸</div>
+        <div class="lock-icon-container" aria-hidden="true">
+          <div class="animated-lock" id="lock-glyph">🔒</div>
+        </div>
+
+        <h1 id="screen-1-title" class="screen-title glow-text">A little surprise for someone special...</h1>
+        <p class="screen-subtitle">Please enter the secret password to open this little world.</p>
+
+        <form id="password-form" class="lock-form" onsubmit="return false;" novalidate>
+          <div class="input-wrapper">
+            <span class="input-prefix" aria-hidden="true">🔑</span>
+            <input 
+              type="password" 
+              id="password-input" 
+              class="styled-input" 
+              placeholder="Enter secret word..." 
+              autocomplete="off" 
+              spellcheck="false"
+              aria-label="Secret Password"
+              required>
+            <button type="button" class="peek-password-btn" id="peek-password-btn" aria-label="Show password">👁️</button>
+          </div>
+
+          <button type="submit" id="unlock-btn" class="glow-btn main-action-btn">
+            <span class="btn-text">Unlock My Heart 💖</span>
+            <span class="btn-sparkle" aria-hidden="true">✨</span>
+          </button>
+        </form>
+
+        <div id="password-error" class="error-toast" role="alert" aria-live="assertive"></div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 2: Romantic Welcome
+         ============================================== -->
+    <section class="screen" id="screen-2" aria-labelledby="screen-2-heading">
+      <div class="glass-card welcome-card">
+        <div class="card-badge">A Heartfelt Hello 💗</div>
+        
+        <div class="anime-avatar-wrapper" aria-hidden="true">
+          <div class="floating-heart-avatar">
+            <span class="inner-heart">🌸</span>
+          </div>
+          <div class="orbiting-dot dot-1">✨</div>
+          <div class="orbiting-dot dot-2">💫</div>
+        </div>
+
+        <h2 id="screen-2-heading" class="typewriter-container">
+          <span id="welcome-typewriter" class="typewriter-text"></span>
+          <span class="typewriter-cursor">|</span>
+        </h2>
+
+        <div class="welcome-actions">
+          <button type="button" id="start-story-btn" class="glow-btn main-action-btn pulse-glow">
+            <span class="btn-text">Begin Our Story ✨</span>
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 3: Animated Love Letter
+         ============================================== -->
+    <section class="screen" id="screen-3" aria-label="A Letter Just For You">
+      <div class="envelope-screen-wrapper">
+        
+        <div class="envelope-instruction">
+          <p class="tap-hint" id="envelope-tap-hint">🌸 A Letter Just For You... Tap The Envelope To Open 💌</p>
+        </div>
+
+        <!-- 3D Envelope Element -->
+        <div class="envelope-container" id="envelope-container" role="button" tabindex="0" aria-label="Click to open letter">
+          <div class="envelope" id="envelope">
+            <div class="envelope-flap flap-top" id="envelope-flap"></div>
+            <div class="envelope-pocket"></div>
+            <div class="envelope-seal" id="envelope-seal">
+              <span>S&amp;J</span>
+            </div>
+
+            <!-- The Letter Sheet that slides up -->
+            <article class="letter-sheet" id="letter-sheet">
+              <!-- Decorative Floral Corners -->
+              <span class="corner-ornament top-left" aria-hidden="true">❦</span>
+              <span class="corner-ornament top-right" aria-hidden="true">❦</span>
+              <span class="corner-ornament bottom-left" aria-hidden="true">❦</span>
+              <span class="corner-ornament bottom-right" aria-hidden="true">❦</span>
+
+              <header class="letter-header">
+                <div class="letter-stamp">
+                  <span class="stamp-icon">🌸</span>
+                  <span class="stamp-text">FOR SARA</span>
+                </div>
+                <div class="letter-meta">
+                  <span class="letter-tag">With All My Heart 💖</span>
+                  <span class="letter-date">A Special Message ✨</span>
+                </div>
+              </header>
+
+              <div class="letter-body" id="letter-body">
+                <div class="letter-text-content" id="letter-typewriter-content">
+                  <!-- Types out via JavaScript -->
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- Continue Button appears after letter opened -->
+        <div class="letter-controls hidden" id="letter-controls">
+          <button type="button" id="to-quiz-btn" class="glow-btn next-screen-btn">
+            <span>Play A Cute Little Quiz 🌸</span>
+            <span class="btn-sparkle" aria-hidden="true">✨</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 4: Cute Love Quiz
+         ============================================== -->
+    <section class="screen" id="screen-4" aria-labelledby="quiz-question-text">
+      <div class="glass-card quiz-card">
+        <div class="quiz-header">
+          <span class="card-badge">Playful Mini Quiz 🧁</span>
+          <div class="quiz-progress" aria-label="Quiz progress">
+            <span class="progress-dot active" id="dot-1"></span>
+            <span class="progress-dot" id="dot-2"></span>
+            <span class="progress-dot" id="dot-3"></span>
+          </div>
+        </div>
+
+        <div class="question-container">
+          <h2 id="quiz-question-text" class="quiz-question">Question loading...</h2>
+          
+          <div class="options-grid" id="quiz-options-grid" role="radiogroup" aria-labelledby="quiz-question-text">
+            <!-- Rendered by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Sweet Feedback Box -->
+        <div class="quiz-reaction hidden" id="quiz-reaction" role="status" aria-live="polite">
+          <span class="reaction-emoji" id="reaction-emoji">🥰</span>
+          <p class="reaction-text" id="reaction-text"></p>
+        </div>
+
+        <div class="quiz-footer" style="justify-content: center;">
+          <button type="button" id="next-question-btn" class="glow-btn mini-btn hidden">
+            <span>Next Question 🌸</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 5: The Proposal
+         ============================================== -->
+    <section class="screen" id="screen-5" aria-labelledby="proposal-title">
+      <div class="glass-card proposal-card" id="proposal-card">
+        
+        <div class="floating-ring-container" aria-hidden="true">
+          <div class="sparkle-ring">💍</div>
+          <div class="radiant-halo"></div>
+        </div>
+
+        <h1 id="proposal-title" class="proposal-title glow-text">
+          Sara, would you give me a chance to become someone special in your life? 💖
+        </h1>
+
+        <p class="proposal-poetry">
+          "Out of everyone in this world, you are the one whose smile makes time slow down, whose kindness leaves an impression, and who I want to know more deeply every day."
+        </p>
+
+        <!-- Dynamic Proposal Button Arena -->
+        <div class="proposal-actions-arena" id="proposal-arena">
+          <button type="button" id="yes-btn" class="proposal-btn yes-btn" aria-label="Say YES to the proposal">
+            <span class="btn-heart-icon" aria-hidden="true">💖</span>
+            <span class="proposal-btn-text">YES, I will! 💍✨</span>
+          </button>
+
+          <button type="button" id="no-btn" class="proposal-btn no-btn" aria-label="Politely decline or playfully dodge">
+            <span class="no-btn-text" id="no-btn-text">No... 🙈</span>
+          </button>
+        </div>
+
+        <!-- Playful Dodge Bubble / Voice Toast -->
+        <div class="playful-bubble hidden" id="playful-bubble" aria-live="polite">
+          <span id="playful-bubble-text">Are you sure? 🥺</span>
+        </div>
+
+        <!-- Mobile-friendly fallback dialog for NO -->
+        <div class="sweet-confirm-dialog hidden" id="sweet-no-dialog" role="dialog" aria-modal="true" aria-labelledby="sweet-dialog-title">
+          <div class="dialog-content">
+            <h3 id="sweet-dialog-title">Aww, Sara... 🥺</h3>
+            <p id="sweet-dialog-text">Are you sure? Take all the time you need, but look how brightly that pink YES button is glowing for you! 💖</p>
+            <div class="dialog-btns">
+              <button type="button" class="glow-btn" id="dialog-yes-btn">Let's try YES instead! 💕</button>
+              <button type="button" class="secondary-btn" id="dialog-close-btn">Close &amp; think about it 🌸</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 6: YES Celebration
+         ============================================== -->
+    <section class="screen" id="screen-6" aria-labelledby="celebration-title">
+      <div class="glass-card celebration-card">
+        
+        <div class="celebration-burst-badge">
+          <span>💖 FOREVER &amp; ALWAYS 💖</span>
+        </div>
+
+        <div class="celebration-graphic" aria-hidden="true">
+          <div class="heart-3d-spinner">
+            <div class="heart-face">💗</div>
+          </div>
+          <div class="confetti-poppers">🎉 ✨ 🌸 ✨ 🎉</div>
+        </div>
+
+        <h1 id="celebration-title" class="celebration-headline glow-text">
+          You just made this moment really special, Sara! 💗
+        </h1>
+
+        <p class="celebration-message">
+          My heart is smiling wider than words could ever describe. Thank you for giving me this chance. Every smile of yours means the entire world to me.
+        </p>
+
+        <div class="celebration-stats">
+          <div class="stat-pill">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Happiness</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Affection</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-number">Today</span>
+            <span class="stat-label">Our New Chapter</span>
+          </div>
+        </div>
+
+        <button type="button" id="to-form-btn" class="glow-btn main-action-btn pulse-glow">
+          <span class="btn-text">Tell Me What's In Your Heart 💌</span>
+          <span class="btn-sparkle" aria-hidden="true">🌸</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 7: Sara's Feelings Form
+         ============================================== -->
+    <section class="screen" id="screen-7" aria-labelledby="form-heading">
+      <div class="glass-card feelings-form-card">
+        
+        <div class="card-badge">Personal Letter to Jahid 💌</div>
+
+        <h2 id="form-heading" class="screen-title">Sara's Feelings</h2>
+        <p class="screen-subtitle">
+          I would love to know what was going through your mind and what you hope for. Take your time writing anything you wish.
+        </p>
+
+        <form id="feelings-form" class="feelings-form" novalidate>
+          
+          <!-- Field 1: First Thought -->
+          <div class="form-group">
+            <label for="field-first-thought" class="form-label">
+              <span class="label-number">1.</span> What was your first thought when you saw this? 🌸
+            </label>
+            <input 
+              type="text" 
+              id="field-first-thought" 
+              name="first_thought" 
+              class="styled-input form-input" 
+              placeholder="e.g. 'I was so surprised and smiled right away...' " 
+              required>
+            <div class="field-error" id="err-first-thought"></div>
+          </div>
+
+          <!-- Field 2: How you feel about me -->
+          <div class="form-group">
+            <label for="field-feelings" class="form-label">
+              <span class="label-number">2.</span> How do you feel about me? 💖
+            </label>
+            <input 
+              type="text" 
+              id="field-feelings" 
+              name="feelings" 
+              class="styled-input form-input" 
+              placeholder="e.g. 'You are sweet, thoughtful, and someone I really value...' " 
+              required>
+            <div class="field-error" id="err-feelings"></div>
+          </div>
+
+          <!-- Field 3: What would you like us to be? -->
+          <div class="form-group">
+            <label for="field-future" class="form-label">
+              <span class="label-number">3.</span> What would you like us to be? ✨
+            </label>
+            <input 
+              type="text" 
+              id="field-future" 
+              name="future" 
+              class="styled-input form-input" 
+              placeholder="e.g. 'Let us go on dates and see where this sweet journey leads...' " 
+              required>
+            <div class="field-error" id="err-future"></div>
+          </div>
+
+          <!-- Field 4: Anything else? (Multiline) -->
+          <div class="form-group">
+            <label for="field-message" class="form-label">
+              <span class="label-number">4.</span> Anything else you want to tell me? 💌
+            </label>
+            <textarea 
+              id="field-message" 
+              name="message" 
+              rows="4" 
+              class="styled-textarea form-input" 
+              placeholder="Write anything in your heart... no matter how long or short."></textarea>
+            <div class="field-error" id="err-message"></div>
+          </div>
+
+          <!-- Form Status Notification -->
+          <div id="form-status" class="form-status-banner hidden" role="status" aria-live="polite"></div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button type="submit" id="submit-feelings-btn" class="glow-btn main-action-btn">
+              <span class="btn-text">Send My Feelings 💌</span>
+              <span class="btn-loader-spinner hidden" id="btn-spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Direct Email / Fallback Modal in case of network issue -->
+        <div class="fallback-email-box hidden" id="fallback-email-box">
+          <p class="fallback-note">
+            💌 <em>If internet delivery hits a snag, you can also send this directly to Jahid via email with one click:</em>
+          </p>
+          <a id="direct-mailto-link" class="secondary-btn mailto-btn" href="#" target="_blank" rel="noopener noreferrer">
+            Open In Your Mail App (jh4406011@gmail.com) ✉️
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 8: Final Message
+         ============================================== -->
+    <section class="screen" id="screen-8" aria-labelledby="final-heading">
+      <div class="glass-card final-card">
+        
+        <div class="moon-star-scene" aria-hidden="true">
+          <div class="anime-moon">🌙</div>
+          <div class="shooting-star star-a"></div>
+          <div class="shooting-star star-b"></div>
+        </div>
+
+        <h1 id="final-heading" class="final-title glow-text">
+          Thank you for sharing your feelings with me, Sara.
+        </h1>
+
+        <p class="final-body">
+          Whatever your answer means for us, I'm glad I got to tell you how I feel. 💗
+        </p>
+
+        <p class="final-subtext">
+          May the stars always shine kindly on you, and may your days be filled with warmth, smiles, and sweet moments.
+        </p>
+
+        <div class="final-heart-cluster" aria-hidden="true">
+          <span class="float-heart fh-1">🌸</span>
+          <span class="float-heart fh-2">💖</span>
+          <span class="float-heart fh-3">✨</span>
+          <span class="float-heart fh-4">🌸</span>
+        </div>
+
+        <div class="final-actions">
+          <button type="button" id="replay-btn" class="glow-btn mini-btn">
+            <span>Replay Our Story 🔄</span>
+          </button>
+        </div>
+
+        <footer class="site-footer">
+          <p>Created with all my heart for Sara 🌸</p>
+        </footer>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>
